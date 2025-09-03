@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:m_performance/Screens/home.dart';
-import 'Screens/search.dart';
+
+import 'Screens/explore.dart';
 import 'Screens/profile.dart';
 import 'custom_widgets/custom_bottom_nav_bar.dart';
 
 class MainLayout extends StatefulWidget {
+  const MainLayout({super.key});
+
   @override
   _MainLayoutState createState() => _MainLayoutState();
 }
@@ -12,7 +15,7 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int currentIndex = 0;
 
-  final List<Widget> _pages = [HomeScreen(), SearchScreen(), ProfileScreen()];
+  final List<Widget> _pages = [HomeScreen(), ExploreScreen(), ProfileScreen()];
 
   @override
   Widget build(BuildContext context) {

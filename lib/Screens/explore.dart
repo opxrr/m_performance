@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:m_performance/custom_widgets/special_offer_widget.dart';
 
-class SearchScreen extends StatelessWidget {
-  List<Map> offers = [
+class ExploreScreen extends StatelessWidget {
+final  List<Map> offers = [
     {
       'pName': 'E36 M3 V8',
       'imagePath': 'assets/images/E36-V8-P63.jpg',
@@ -29,7 +29,7 @@ class SearchScreen extends StatelessWidget {
     },
   ];
 
-  SearchScreen({super.key});
+  ExploreScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

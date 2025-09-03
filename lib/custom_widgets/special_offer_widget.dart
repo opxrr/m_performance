@@ -27,7 +27,7 @@ class SpecialOfferWidget extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black45,
             blurRadius: 8,
             offset: Offset(0, 4),
           ),

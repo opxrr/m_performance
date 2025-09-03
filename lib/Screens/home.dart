@@ -7,7 +7,7 @@ class HomeScreen extends StatelessWidget {
     'assets/images/m3.jpeg',
     'assets/images/m5.jpeg',
   ];
-  List<Map> pCards = [
+  final List<Map> pCards = [
     {
       'imageUrl': 'assets/images/m1.jpg',
       'productName': 'M1 Speedster',

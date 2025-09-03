@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,21 +23,21 @@ class ProfileScreen extends StatelessWidget {
                 radius: 80,
               ),
             ),
-            Text(
-              'Yasso El Dev',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Edit', style: TextStyle(color: Colors.white)),
-                SizedBox(width: 8),
-                Icon(Icons.edit_note, color: Colors.white, size: 20),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(top: 30),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, 'registerScreen');
+                },
+                child: Text(
+                  "Login",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+
             ),
           ],
         ),

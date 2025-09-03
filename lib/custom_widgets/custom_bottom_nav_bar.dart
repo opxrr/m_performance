@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
-    final Function(int) onTabSelected;
+  final Function(int) onTabSelected;
 
   const CustomBottomNavBar({
     super.key,
@@ -23,7 +23,7 @@ class CustomBottomNavBar extends StatelessWidget {
       height: 55,
       items: const [
         TabItem(icon: Icons.directions_car, title: 'Home'),
-        TabItem(icon: Icons.travel_explore_sharp, title: 'Explore'),
+        TabItem(icon: Icons.travel_explore, title: 'Explore'),
         TabItem(icon: Icons.person, title: 'Profile'),
       ],
       onTap: onTabSelected,
