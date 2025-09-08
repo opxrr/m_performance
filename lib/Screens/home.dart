@@ -1,79 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:m_performance/admin/car_manager.dart';
+import 'package:m_performance/database/carsData.dart';
 
 import '../custom_widgets/product_card.dart';
 
 class HomeScreen extends StatelessWidget {
+  static const String routeName = 'homeScreen';
   final List<String> swiperImages = [
     'assets/images/m3.jpeg',
     'assets/images/m5.jpeg',
-  ];
-  final List<Map> pCards = [
-    {
-      'imageUrl': 'assets/images/m1.jpg',
-      'productName': 'M1 Speedster',
-      'price': 45000,
-    },
-    {
-      'imageUrl': 'assets/images/m2.jpeg',
-      'productName': 'M2 Coupe',
-      'price': 48000,
-    },
-    {
-      'imageUrl': 'assets/images/m3.jpeg',
-      'productName': 'M3 Sedan',
-      'price': 52000,
-    },
-    {
-      'imageUrl': 'assets/images/m04.jpg',
-      'productName': 'M4 Competition',
-      'price': 60000,
-    },
-    {
-      'imageUrl': 'assets/images/m5.jpeg',
-      'productName': 'M5 Touring',
-      'price': 65000,
-    },
-    {
-      'imageUrl': 'assets/images/m06.jpeg',
-      'productName': 'M6 Gran Coupe',
-      'price': 70000,
-    },
-    {
-      'imageUrl': 'assets/images/m07.jpg',
-      'productName': 'M7 Luxury',
-      'price': 75000,
-    },
-    {
-      'imageUrl': 'assets/images/m4LB.jpeg',
-      'productName': 'M4L Edition',
-      'price': 62000,
-    },
-    {
-      'imageUrl': 'assets/images/m05.jpg',
-      'productName': 'M0S Sport',
-      'price': 55000,
-    },
-    {
-      'imageUrl': 'assets/images/m05.jpg',
-      'productName': 'M05 Classic',
-      'price': 50000,
-    },
-    {
-      'imageUrl': 'assets/images/m06.jpeg',
-      'productName': 'M06 Performance',
-      'price': 58000,
-    },
-    {
-      'imageUrl': 'assets/images/m07.jpg',
-      'productName': 'M07 Elite',
-      'price': 63000,
-    },
   ];
 
   HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final CarManager carManager = CarManager();
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -136,26 +79,52 @@ class HomeScreen extends StatelessWidget {
                         Text(
                           "M Performance — crafted for speed lovers.",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        GridView.count(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          children: pCards.map((product) {
-                            return ProductCard(
-                              imageUrl: product['imageUrl'],
-                              productName: product['productName'],
-                              price: product['price'].toDouble(),
+                        FutureBuilder<List<CarProject>>(
+                          future: carManager.getAllCars(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  'Error loading cars: ${snapshot.error}',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                              );
+                            }
+                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return const Center(
+                                child: Text(
+                                  'No cars available',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              );
+                            }
+                            final cars = snapshot.data!;
+                            return GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              children: cars.map((car) {
+                                return ProductCard(car: car);
+                              }).toList(),
                             );
-                          }).toList(),
+                          },
                         ),
-                        SizedBox(height: 800),
                       ],
                     ),
                   ),

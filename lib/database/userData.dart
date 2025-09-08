@@ -2,7 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class User {
-  final int? id; // Nullable for new users before insertion
+  final int? id;
   final String username;
   final String email;
   final String password;
@@ -11,7 +11,8 @@ class User {
     this.id,
     required this.username,
     required this.email,
-    required this.password, String? gender,
+    required this.password,
+    String? gender,
   });
 
   Map<String, dynamic> toMap() {
@@ -39,7 +40,7 @@ class User {
 }
 
 class UsersTable {
-  Database? _database; // Nullable to avoid late initialization issues
+  Database? _database;
   static const String _tableName = 'users';
   static const String _databaseName = 'users.db';
 
@@ -52,7 +53,6 @@ class UsersTable {
   Future<Database> _initDatabase() async {
     try {
       String path = join(await getDatabasesPath(), _databaseName);
-
       return await openDatabase(
         path,
         version: 1,
@@ -87,7 +87,7 @@ class UsersTable {
       );
     } catch (e) {
       print('Error inserting user: $e');
-      return -1; // Indicate failure
+      return -1;
     }
   }
 
@@ -131,7 +131,7 @@ class UsersTable {
       );
     } catch (e) {
       print('Error updating user: $e');
-      return -1; // Indicate failure
+      return -1;
     }
   }
 

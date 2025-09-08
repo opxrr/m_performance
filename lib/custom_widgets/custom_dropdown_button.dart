@@ -37,7 +37,10 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
       padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
       child: DropdownButtonFormField<String>(
         initialValue: _selectedValue,
-        hint: Text(widget.hintText, style: const TextStyle(color: Colors.white70)),
+        hint: Text(
+          widget.hintText,
+          style: const TextStyle(color: Colors.white70),
+        ),
         items: widget.items.map((String value) {
           return DropdownMenuItem<String>(
             value: value,

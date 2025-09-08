@@ -26,11 +26,7 @@ class SpecialOfferWidget extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black45,
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.black45, blurRadius: 8, offset: Offset(0, 4)),
         ],
       ),
       height: 130,
@@ -53,8 +49,10 @@ class SpecialOfferWidget extends StatelessWidget {
                 top: 6,
                 left: 6,
                 child: Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.redAccent,
                     borderRadius: BorderRadius.circular(12),

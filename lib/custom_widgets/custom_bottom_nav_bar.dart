@@ -1,5 +1,6 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -21,10 +22,10 @@ class CustomBottomNavBar extends StatelessWidget {
       initialActiveIndex: currentIndex,
       curveSize: 100,
       height: 55,
-      items: const [
-        TabItem(icon: Icons.directions_car, title: 'Home'),
-        TabItem(icon: Icons.travel_explore, title: 'Explore'),
-        TabItem(icon: Icons.person, title: 'Profile'),
+      items: [
+        TabItem(icon: SvgPicture.asset('assets/images/bmw.svg'), title: 'Home'),
+        const TabItem(icon: Icons.travel_explore, title: 'Explore'),
+        const TabItem(icon: Icons.person, title: 'Profile'),
       ],
       onTap: onTabSelected,
     );

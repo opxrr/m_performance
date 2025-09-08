@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
+  static const String routeName = 'profileScreen';
+
   const ProfileScreen({super.key});
 
   @override
@@ -30,14 +32,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Navigator.pushNamed(context, 'registerScreen');
                 },
                 child: Text(
-                  "Login",
+                  "Sign In",
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              )
-
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 30),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, 'adminPanel');
+                },
+                child: Text(
+                  "Login as admin",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
