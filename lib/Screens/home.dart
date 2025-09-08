@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../custom_widgets/product_card.dart';
 
 class HomeScreen extends StatelessWidget {
+  static const String routeName = 'homeScreen';
   final List<String> swiperImages = [
     'assets/images/m3.jpeg',
     'assets/images/m5.jpeg',

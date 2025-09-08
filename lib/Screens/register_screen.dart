@@ -3,9 +3,9 @@ import 'package:m_performance/custom_widgets/custom_dropdown_button.dart';
 import 'package:m_performance/custom_widgets/custom_text_form_field.dart';
 import 'package:m_performance/database/userData.dart';
 
-
-
 class RegisterScreen extends StatefulWidget {
+  static const String routeName = 'registerScreen';
+
   const RegisterScreen({super.key});
 
   @override
@@ -179,10 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               CustomDropdownButton(
                 hintText: 'Gender',
                 items: const ['Male', 'Female'],
-                prefixIcon: const Icon(
-                  Icons.male,
-                  color: Colors.white70,
-                ),
+                prefixIcon: const Icon(Icons.male, color: Colors.white70),
                 onChanged: (value) {
                   setState(() {
                     _selectedGender = value; // Simplified, no need for ternary

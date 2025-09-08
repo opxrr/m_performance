@@ -11,7 +11,8 @@ class User {
     this.id,
     required this.username,
     required this.email,
-    required this.password, String? gender,
+    required this.password,
+    String? gender,
   });
 
   Map<String, dynamic> toMap() {
@@ -52,7 +53,6 @@ class UsersTable {
   Future<Database> _initDatabase() async {
     try {
       String path = join(await getDatabasesPath(), _databaseName);
-
       return await openDatabase(
         path,
         version: 1,
@@ -87,7 +87,7 @@ class UsersTable {
       );
     } catch (e) {
       print('Error inserting user: $e');
-      return -1; // Indicate failure
+      return -1;
     }
   }
 
@@ -131,7 +131,7 @@ class UsersTable {
       );
     } catch (e) {
       print('Error updating user: $e');
-      return -1; // Indicate failure
+      return -1;
     }
   }
 

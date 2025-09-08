@@ -4,12 +4,16 @@ class ProductCard extends StatelessWidget {
   final String imageUrl;
   final String productName;
   final double price;
+  final double? oldPrice;
+  final double? rating;
 
   const ProductCard({
     super.key,
     required this.imageUrl,
     required this.productName,
     required this.price,
+    this.oldPrice,
+    this.rating,
   });
 
   @override
@@ -23,14 +27,12 @@ class ProductCard extends StatelessWidget {
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-              child: Image.asset(
-                imageUrl,
-                fit: BoxFit.cover,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(15),
               ),
+              child: Image.asset(imageUrl, fit: BoxFit.cover),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(
@@ -47,14 +49,45 @@ class ProductCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  "\$${price.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      "\$${price.toStringAsFixed(2)}",
+                      style: const TextStyle(
+                        color: Colors.green,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (oldPrice != null) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        "\$${oldPrice!.toStringAsFixed(2)}",
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
+                if (rating != null) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        rating!.toStringAsFixed(1),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
