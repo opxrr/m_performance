@@ -30,10 +30,6 @@ class MyApp extends StatelessWidget {
         RegisterScreen.routeName: (context) => RegisterScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
         AdminPanel.routeName: (context) => AdminPanel(),
-        CarDetailsScreen.routeName: (context) => CarDetailsScreen(
-          car: ModalRoute.of(context)!.settings.arguments as CarProject,
-        ),
-
       },
     );
   }
