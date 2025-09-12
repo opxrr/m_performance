@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:m_performance/Screens/product_details_screen.dart';
 import 'package:m_performance/Screens/login_screen.dart';
-import 'package:m_performance/Screens/car_details_screen.dart';
 import 'package:m_performance/Screens/register_screen.dart';
 import 'package:m_performance/admin/admin_panel.dart';
 import 'package:m_performance/main_layout.dart';
@@ -8,7 +8,7 @@ import 'package:m_performance/main_layout.dart';
 import 'Screens/explore.dart';
 import 'Screens/home.dart';
 import 'Screens/profile.dart';
-import 'database/carsData.dart';
+import 'm_database/product.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,8 +30,8 @@ class MyApp extends StatelessWidget {
         RegisterScreen.routeName: (context) => RegisterScreen(),
         LoginScreen.routeName: (context) => LoginScreen(),
         AdminPanel.routeName: (context) => AdminPanel(),
-        CarDetailsScreen.routeName: (context) => CarDetailsScreen(
-          car: ModalRoute.of(context)!.settings.arguments as CarProject,
+        ProductDetailsScreen.routeName: (context) => ProductDetailsScreen(
+          product: ModalRoute.of(context)!.settings.arguments as Product,
         ),
       },
     );
