@@ -23,6 +23,17 @@ class _MainLayoutState extends State<MainLayout> {
       extendBody: true,
       backgroundColor: Colors.black,
       appBar: AppBar(
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushNamed(context, 'loginScreen');
+            },
+            child: Text(
+              'Login',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
+        ],
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,

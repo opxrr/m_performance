@@ -1,12 +1,11 @@
-// lib/custom_widgets/product_card.dart
 import 'package:flutter/material.dart';
-import 'package:m_performance/Screens/car_details_screen.dart';
-import 'package:m_performance/database/carsData.dart';
+import 'package:m_performance/Screens/product_details_screen.dart';
+import 'package:m_performance/m_database/product.dart';
 
-class ProductCard extends StatelessWidget {
-  final CarProject car;
+class MyProductCard extends StatelessWidget {
+  final Product product;
 
-  const ProductCard({super.key, required this.car});
+  const MyProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +13,8 @@ class ProductCard extends StatelessWidget {
       onTap: () {
         Navigator.pushNamed(
           context,
-          CarDetailsScreen.routeName,
-          arguments: car,
+          ProductDetailsScreen.routeName,
+          arguments: product,
         );
       },
       child: Card(
@@ -31,7 +30,7 @@ class ProductCard extends StatelessWidget {
                   top: Radius.circular(15),
                 ),
                 child: Image.asset(
-                  car.imagePath,
+                  product.imagePath,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Image.asset(
                     'assets/images/placeholder.jpeg',
@@ -47,7 +46,7 @@ class ProductCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    car.modelName,
+                    product.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -59,7 +58,7 @@ class ProductCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "\$${car.price.toStringAsFixed(2)}",
+                        "\$${product.price.toStringAsFixed(2)}",
                         style: const TextStyle(
                           color: Colors.green,
                           fontSize: 13,

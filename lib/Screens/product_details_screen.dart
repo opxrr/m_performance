@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:m_performance/database/carsData.dart';
+import 'package:m_performance/m_database/car.dart';
+import 'package:m_performance/m_database/part.dart';
+import 'package:m_performance/m_database/product.dart';
 
-class CarDetailsScreen extends StatelessWidget {
-  static const String routeName = 'carDetailsScreen';
-  final CarProject car;
+class ProductDetailsScreen extends StatelessWidget {
+  static const String routeName = 'productDetailsScreen';
+  final Product product;
 
-  const CarDetailsScreen({super.key, required this.car});
+  const ProductDetailsScreen({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    precacheImage(AssetImage(car.imagePath), context);
+    precacheImage(AssetImage(product.imagePath), context);
     precacheImage(const AssetImage('assets/images/placeholder.jpeg'), context);
     precacheImage(const AssetImage('assets/images/mWallPaper.jpeg'), context);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          car.modelName,
+          product.name,
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -53,7 +55,7 @@ class CarDetailsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Hero(
-                  tag: 'car-image-${car.id ?? car.modelName}',
+                  tag: 'product-image-${product.id ?? product.name}',
                   child: Container(
                     height: 300,
                     margin: const EdgeInsets.all(16.0),
@@ -71,7 +73,7 @@ class CarDetailsScreen extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: Image.asset(
-                        car.imagePath,
+                        product.imagePath,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             Image.asset(
@@ -82,7 +84,6 @@ class CarDetailsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Container(
@@ -118,7 +119,7 @@ class CarDetailsScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            car.modelName,
+                            product.name,
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -140,9 +141,7 @@ class CarDetailsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
@@ -157,7 +156,7 @@ class CarDetailsScreen extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              'Price: \$${car.price.toStringAsFixed(2)}',
+                              'Price: \$${product.price.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -167,18 +166,85 @@ class CarDetailsScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Description: ${car.description}',
+                              'Description: ${product.description}',
                               style: const TextStyle(
                                 color: Colors.white70,
                                 fontSize: 16,
                               ),
                               textAlign: TextAlign.center,
                             ),
+                            const SizedBox(height: 8),
+                            if (product is Car) ...[
+                              Text(
+                                'Horsepower: ${(product as Car).horsepower} HP',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'Top Speed: ${(product as Car).topSpeed} km/h',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'Weight: ${(product as Car).weight} kg',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                '0-100 km/h: ${(product as Car).zeroToHundred.toStringAsFixed(1)} s',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ] else if (product is Part) ...[
+                              Text(
+                                'HP Boost: ${(product as Part).hpBoost}',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'Top Speed Boost: ${(product as Part).topSpeedBoost} km/h',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'Weight Change: ${(product as Part).weightChange} kg',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                '0-100 Change: ${(product as Part).zeroToHundredChange.toStringAsFixed(1)} s',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ],
                         ),
                       ),
                       const SizedBox(height: 24),
-
                       Center(
                         child: ElevatedButton(
                           onPressed: () => Navigator.pop(context),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:m_performance/custom_widgets/custom_dropdown_button.dart';
 import 'package:m_performance/custom_widgets/custom_text_form_field.dart';
-import 'package:m_performance/database/userData.dart';
+import 'package:m_performance/m_database/database_manager.dart';
+import 'package:m_performance/m_database/user.dart';
+import 'package:sqflite/sqflite.dart';
+
 
 class RegisterScreen extends StatefulWidget {
   static const String routeName = 'registerScreen';
@@ -17,8 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  String? _selectedGender;
-  final UsersTable _usersTable = UsersTable();
+  final UserTable _userTable = UserTable(DatabaseManager());
 
   @override
   void dispose() {
@@ -31,72 +32,86 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       User newUser = User(
-        username: _usernameController.text,
+        name: _usernameController.text,
         email: _emailController.text,
         password: _passwordController.text,
-        gender: _selectedGender,
+        favorites: [],
+        cart: [],
+        profilePicPath: null,
       );
-      int id = await _usersTable.insertUser(newUser);
-      if (id != -1) {
-        // Show success dialog
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF232020),
-            title: const Text(
-              'Welcome aboard !',
-              style: TextStyle(color: Colors.white),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, 'loginScreen');
-                },
-                child: Center(
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(color: Colors.blueAccent),
+      try {
+        int id = await _userTable.insertUser(newUser);
+        if (id != -1) {
+          // Show success dialog
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: const Color(0xFF232020),
+              title: const Text(
+                'Welcome aboard!',
+                style: TextStyle(color: Colors.white),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'loginScreen');
+                  },
+                  child: const Center(
+                    child: Text(
+                      'Login',
+                      style: TextStyle(color: Colors.blueAccent),
+                    ),
                   ),
                 ),
+              ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-            ],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
             ),
-          ),
-        );
-      } else {
-        // Show error dialog
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF232020),
-            title: const Text(
-              'Registration Failed',
-              style: TextStyle(color: Colors.white),
-            ),
-            content: const Text(
-              'Error registering user. Please try again.',
-              style: TextStyle(color: Colors.white70),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close dialog
-                },
-                child: const Text(
-                  'OK',
-                  style: TextStyle(color: Colors.blueAccent),
-                ),
-              ),
-            ],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-          ),
-        );
+          );
+        } else {
+          // Show generic error dialog
+          _showErrorDialog('Error registering user. Please try again.');
+        }
+      } on DatabaseException catch (e) {
+        if (e.isUniqueConstraintError()) {
+          _showErrorDialog('Email already exists. Please use a different email.');
+        } else {
+          _showErrorDialog('Error registering user: $e');
+        }
       }
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF232020),
+        title: const Text(
+          'Registration Failed',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text(
+              'OK',
+              style: TextStyle(color: Colors.blueAccent),
+            ),
+          ),
+        ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+      ),
+    );
   }
 
   @override
@@ -109,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           "assets/images/mLogo.png",
           width: 160,
           errorBuilder: (context, error, stackTrace) =>
-              const Text('Logo', style: TextStyle(color: Colors.white)),
+          const Text('Logo', style: TextStyle(color: Colors.white)),
         ),
         centerTitle: true,
       ),
@@ -172,22 +187,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   }
                   if (value.length < 6) {
                     return 'password must be at least 6 characters';
-                  }
-                  return null;
-                },
-              ),
-              CustomDropdownButton(
-                hintText: 'Gender',
-                items: const ['Male', 'Female'],
-                prefixIcon: const Icon(Icons.male, color: Colors.white70),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedGender = value; // Simplified, no need for ternary
-                  });
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return 'please choose gender';
                   }
                   return null;
                 },
