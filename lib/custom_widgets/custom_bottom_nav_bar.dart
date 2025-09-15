@@ -24,8 +24,9 @@ class CustomBottomNavBar extends StatelessWidget {
       height: 55,
       items: [
         TabItem(icon: SvgPicture.asset('assets/images/bmw.svg'), title: 'Home'),
-        const TabItem(icon: Icons.travel_explore, title: 'Explore'),
         const TabItem(icon: Icons.person, title: 'Profile'),
+        const TabItem(icon: Icons.menu, title: 'More'),
+
       ],
       onTap: onTabSelected,
     );

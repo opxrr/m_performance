@@ -21,7 +21,7 @@ class DatabaseManager {
       String path = join(await getDatabasesPath(), _databaseName);
       return await openDatabase(
         path,
-        version: 2,  // Keep at 2; onUpgrade handles existing DBs
+        version: 2,
         onCreate: (db, version) async {
           print('onCreate triggered - Creating fresh DB');
           // Create Users table
@@ -37,13 +37,13 @@ class DatabaseManager {
             )
           ''');
 
-          // Pre-insert fixed admin user on first creation
+
           await db.insert(
             _usersTable,
             {
               'name': 'Admin',
               'email': 'admin@email.com',
-              'password': 'adminpass',  // Change/hash this in production!
+              'password': 'adminpass',
               'favorites': '[]',
               'cart': '[]',
             },
@@ -51,7 +51,6 @@ class DatabaseManager {
           );
           print('Admin user inserted successfully (onCreate)');
 
-          // Create Cars table
           await db.execute('''
             CREATE TABLE $_carsTable (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,7 +65,6 @@ class DatabaseManager {
             )
           ''');
 
-          // Create Parts table
           await db.execute('''
             CREATE TABLE $_partsTable (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,7 +79,6 @@ class DatabaseManager {
             )
           ''');
 
-          // Create CartItems table
           await db.execute('''
             CREATE TABLE $_cartItemsTable (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,7 +90,6 @@ class DatabaseManager {
             )
           ''');
 
-          // Create CarParts junction table
           await db.execute('''
             CREATE TABLE $_carPartsTable (
               carId INTEGER NOT NULL,
@@ -109,7 +105,6 @@ class DatabaseManager {
         onUpgrade: (db, oldVersion, newVersion) async {
           print('Database upgrade from version $oldVersion to $newVersion');
           if (oldVersion < 2) {
-            // Ensure users table exists
             await db.execute('''
               CREATE TABLE IF NOT EXISTS $_usersTable (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -143,7 +138,6 @@ class DatabaseManager {
               print('Admin user already exists (onUpgrade)');
             }
 
-            // Ensure Cars table exists (full SQL)
             await db.execute('''
               CREATE TABLE IF NOT EXISTS $_carsTable (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -158,7 +152,6 @@ class DatabaseManager {
               )
             ''');
 
-            // Ensure Parts table exists (full SQL)
             await db.execute('''
               CREATE TABLE IF NOT EXISTS $_partsTable (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -173,7 +166,6 @@ class DatabaseManager {
               )
             ''');
 
-            // Ensure CartItems table exists (full SQL)
             await db.execute('''
               CREATE TABLE IF NOT EXISTS $_cartItemsTable (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -185,7 +177,6 @@ class DatabaseManager {
               )
             ''');
 
-            // Ensure CarParts table exists (full SQL)
             await db.execute('''
               CREATE TABLE IF NOT EXISTS $_carPartsTable (
                 carId INTEGER NOT NULL,

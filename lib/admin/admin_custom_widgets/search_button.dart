@@ -1,14 +1,11 @@
-// lib/admin/admin_custom_widgets/search_button.dart
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:m_performance/admin/admin_custom_widgets/dialogs.dart';
 import 'package:m_performance/admin/admin_custom_widgets/search_type.dart';
 import 'package:m_performance/m_database/car_manager.dart';
 import 'package:m_performance/m_database/part_manager.dart';
-import 'package:m_performance/m_database/user.dart';
+import 'package:m_performance/m_database/models/user.dart';
 
-// Remove this local definition:
-// enum SearchType { car, part, user }
 
 class SearchButton extends StatelessWidget {
   final CarManager carManager;

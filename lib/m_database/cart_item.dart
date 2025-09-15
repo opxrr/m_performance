@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 
 import 'database_manager.dart';
-import 'part.dart';
+import 'models/part.dart';
 
 class CarParts {
   final int carId;

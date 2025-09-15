@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'car.dart';
+import 'models/car.dart';
 import 'database_manager.dart';
 
 class CarManager {
@@ -60,10 +60,10 @@ class CarManager {
       );
       final db = await _dbManager.database;
       int res = await db.insert(
-        'cars', // Table name from DatabaseManager
+        'cars',
         car.toMap(),
         conflictAlgorithm:
-            ConflictAlgorithm.replace, // Handles potential conflicts
+            ConflictAlgorithm.replace,
       );
       return res > 0 ? 'Car added successfully: $res' : 'Inserting failed!';
     } catch (e) {

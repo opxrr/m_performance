@@ -1,7 +1,7 @@
-import 'car.dart';
 import 'cart_item.dart';
 import 'database_manager.dart';
-import 'part.dart';
+import 'models/car.dart';
+import 'models/part.dart';
 
 class CarDetailsManager {
   final DatabaseManager _dbManager;

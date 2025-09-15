@@ -3,7 +3,7 @@ import 'package:m_performance/Screens/home.dart';
 import 'package:m_performance/Screens/register_screen.dart';
 import 'package:m_performance/admin/admin_panel.dart';
 import 'package:m_performance/m_database/database_manager.dart';
-import 'package:m_performance/m_database/user.dart';
+import 'package:m_performance/m_database/models/user.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = 'loginScreen';
@@ -160,7 +160,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                     ),
                     const SizedBox(height: 15),
-                    // Optional: Sign-up link
                     TextButton(
                       onPressed: () => Navigator.pushNamed(
                         context,

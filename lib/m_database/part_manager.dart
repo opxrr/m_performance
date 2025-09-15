@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:m_performance/m_database/database_manager.dart';
-import 'package:m_performance/m_database/part.dart';
+import 'package:m_performance/m_database/models/part.dart';
 import 'package:sqflite/sql.dart';
 
 class PartManager {
