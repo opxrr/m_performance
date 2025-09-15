@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
-import 'database_manager.dart';
+import '../database_manager.dart';
 
 class User {
   final int? id;
@@ -65,12 +65,13 @@ class UserTable {
       return await db.insert(
         _tableName,
         user.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.abort,  // Abort on UNIQUE violation to catch errors
+        conflictAlgorithm: ConflictAlgorithm
+            .abort,
       );
     } on DatabaseException catch (e) {
       if (e.toString().contains('UNIQUE constraint failed')) {
         print('Duplicate email attempted: ${user.email}');
-        return -2;  // Signal duplicate email
+        return -2; // Signal duplicate email
       }
       print('Error inserting user: $e');
       return -1;
@@ -97,7 +98,7 @@ class UserTable {
       final List<Map<String, dynamic>> maps = await db.query(
         _tableName,
         where: 'email = ?',
-        whereArgs: [email],  // Safe parameterization
+        whereArgs: [email],
       );
       if (maps.isNotEmpty) {
         return User.fromMap(maps.first);
@@ -115,7 +116,7 @@ class UserTable {
       final List<Map<String, dynamic>> maps = await db.query(
         _tableName,
         where: 'name = ?',
-        whereArgs: [name],  // Safe parameterization
+        whereArgs: [name],
       );
       if (maps.isNotEmpty) {
         return User.fromMap(maps.first);
@@ -134,7 +135,7 @@ class UserTable {
         _tableName,
         user.toMap(),
         where: 'id = ?',
-        whereArgs: [user.id],  // Safe parameterization
+        whereArgs: [user.id],
       );
     } catch (e) {
       print('Error updating user: $e');

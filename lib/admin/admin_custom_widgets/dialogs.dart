@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:m_performance/m_database/car.dart';
-import 'package:m_performance/m_database/part.dart';
-import 'package:m_performance/m_database/user.dart';
+import 'package:m_performance/m_database/models/car.dart';
+import 'package:m_performance/m_database/models/part.dart';
+import 'package:m_performance/m_database/models/user.dart';
 import 'package:m_performance/m_database/car_manager.dart';
 import 'package:m_performance/m_database/part_manager.dart';
 

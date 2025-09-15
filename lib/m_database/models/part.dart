@@ -1,5 +1,4 @@
-
-import 'package:m_performance/m_database/product.dart';
+import 'package:m_performance/m_database/models/product.dart';
 
 class Part implements Product {
   @override

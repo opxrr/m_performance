@@ -1,283 +1,475 @@
-import 'package:flutter/material.dart';
-import 'package:m_performance/m_database/car.dart';
-import 'package:m_performance/m_database/part.dart';
-import 'package:m_performance/m_database/product.dart';
+import 'dart:ui';
 
-class ProductDetailsScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:m_performance/m_database/models/car.dart';
+import 'package:m_performance/m_database/models/part.dart';
+import 'package:m_performance/m_database/models/product.dart';
+import 'package:m_performance/m_database/part_manager.dart';
+
+import '../cubit/car_cubit/car_logic.dart';
+import '../cubit/car_cubit/car_state.dart';
+import '../cubit/car_cubit/performance_state.dart';
+
+class ProductDetailsScreen extends StatefulWidget {
   static const String routeName = 'productDetailsScreen';
   final Product product;
 
   const ProductDetailsScreen({super.key, required this.product});
 
   @override
-  Widget build(BuildContext context) {
-    precacheImage(AssetImage(product.imagePath), context);
-    precacheImage(const AssetImage('assets/images/placeholder.jpeg'), context);
-    precacheImage(const AssetImage('assets/images/mWallPaper.jpeg'), context);
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+}
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          product.name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-          ),
+class _ProductDetailsScreenState extends State<ProductDetailsScreen>
+    with SingleTickerProviderStateMixin {
+  bool _isFavorite = false;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _imagesPrecached = false;
+  late PartManager _partManager;
+
+  @override
+  void initState() {
+    super.initState();
+    _partManager = PartManager();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    if (widget.product is Car) {
+      context.read<CarLogic>().showCar(widget.product as Car);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_imagesPrecached) {
+      precacheImage(AssetImage(widget.product.imagePath), context);
+      precacheImage(
+        const AssetImage('assets/images/placeholder.jpeg'),
+        context,
+      );
+      precacheImage(const AssetImage('assets/images/mWallPaper.jpeg'), context);
+      _partManager.getAllParts().then((parts) {
+        for (var part in parts) {
+          precacheImage(AssetImage(part.imagePath), context);
+        }
+      });
+      _imagesPrecached = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _partManager.dispose();
+    super.dispose();
+  }
+
+  void _toggleFavorite() {
+    setState(() {
+      _isFavorite = !_isFavorite;
+      if (_isFavorite) {
+        _animationController.forward().then(
+          (_) => _animationController.reverse(),
+        );
+      }
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _isFavorite ? 'Added to Favorites' : 'Removed from Favorites',
         ),
-        centerTitle: true,
-        backgroundColor: Colors.indigo.withValues(alpha: 0.7),
-        elevation: 0,
-        shadowColor: Colors.indigoAccent,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.indigo, Colors.indigo.withValues(alpha: 0.3)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-        ),
+        duration: const Duration(seconds: 2),
       ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/mWallPaper.jpeg',
-              color: Colors.black45,
-              colorBlendMode: BlendMode.darken,
-              fit: BoxFit.cover,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return BlocBuilder<CarLogic, CarState>(
+      builder: (context, state) {
+        Car car = widget.product is Car
+            ? widget.product as Car
+            : Car(
+                id: 0,
+                modelName: 'Unknown',
+                price: 0,
+                imagePath: 'assets/images/placeholder.jpeg',
+                description: 'No description available',
+                horsepower: 0,
+                topSpeed: 0,
+                weight: 0,
+                zeroToHundred: 0,
+              );
+        Car originalCar = car;
+        List<Part> appliedParts = [];
+        if (state is ShowCar) {
+          car = state.car;
+          originalCar = state.originalCar;
+          appliedParts = state.appliedParts;
+        } else if (state is UpdateCar) {
+          car = state.car;
+          originalCar = state.originalCar;
+          appliedParts = state.appliedParts;
+        }
+
+        final totalPrice =
+            widget.product.price +
+            appliedParts.fold<double>(
+              0,
+              (sum, part) => sum + (part.price ?? 0),
+            );
+
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            title: Text(
+              widget.product.name,
+              style: theme.textTheme.headlineLarge,
             ),
-          ),
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Hero(
-                  tag: 'product-image-${product.id ?? product.name}',
-                  child: Container(
-                    height: 300,
-                    margin: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.asset(
-                        product.imagePath,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.asset(
-                              'assets/images/placeholder.jpeg',
-                              fit: BoxFit.cover,
-                            ),
-                      ),
-                    ),
+            centerTitle: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [theme.primaryColor, theme.secondaryHeaderColor],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+            ),
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: theme.iconTheme.color,
+                size: 24,
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.share, color: theme.iconTheme.color, size: 24),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Share feature coming soon!')),
+                  );
+                },
+                tooltip: 'Share Product',
+              ),
+              IconButton(
+                icon: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Icon(
+                    _isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: _isFavorite
+                        ? Colors.redAccent
+                        : theme.iconTheme.color,
+                    size: 24,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.indigo.withValues(alpha: 0.9),
-                          Colors.black.withValues(alpha: 0.7),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                onPressed: _toggleFavorite,
+                tooltip: 'Toggle Favorite',
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Added to Cart')));
+            },
+            backgroundColor: theme.floatingActionButtonTheme.backgroundColor,
+            tooltip: 'Add to Cart',
+            child: Icon(
+              Icons.add_shopping_cart,
+              color: theme.floatingActionButtonTheme.foregroundColor,
+            ),
+          ),
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/images/mWallPaper.jpeg',
+                  color: Colors.black54,
+                  colorBlendMode: BlendMode.darken,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 100),
+                    // Hero Image
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Hero(
+                        tag:
+                            'product-image-${widget.product.id ?? widget.product.name}',
+                        child: GestureDetector(
+                          onDoubleTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                backgroundColor: Colors.transparent,
+                                child: InteractiveViewer(
+                                  panEnabled: true,
+                                  minScale: 0.5,
+                                  maxScale: 4.0,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(24),
+                                    child: Image.asset(
+                                      widget.product.imagePath,
+                                      fit: BoxFit.contain,
+                                      errorBuilder:
+                                          (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) => Image.asset(
+                                            'assets/images/placeholder.jpeg',
+                                            fit: BoxFit.contain,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: Image.asset(
+                              widget.product.imagePath,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                    'assets/images/placeholder.jpeg',
+                                    fit: BoxFit.contain,
+                                  ),
+                            ),
+                          ),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.4),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 70,
-                          width: 70,
-                          child: Image.asset('assets/images/mLogoll.png'),
-                        ),
-                        Expanded(
-                          child: Text(
-                            product.name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 28,
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(1.5, 1.5),
-                                  blurRadius: 4,
-                                  color: Colors.black54,
+                    const SizedBox(height: 20),
+                    // Performance Stats
+                    if (widget.product is Car)
+                      PerformanceStats(
+                        horsepower: car.horsepower.toDouble(),
+                        speed: car.topSpeed.toDouble(),
+                        weight: car.weight.toDouble(),
+                        acceleration: car.zeroToHundred,
+                        originalCar: originalCar,
+                      ),
+                    if (widget.product is Car) const SizedBox(height: 20),
+                    // Parts Selector (only for cars)
+                    if (widget.product is Car)
+                      FutureBuilder<List<Part>>(
+                        future: _partManager.getAllParts(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return const Center(
+                              child: Text('Error loading parts'),
+                            );
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return const Center(
+                              child: Text('No parts available'),
+                            );
+                          }
+
+                          final parts = snapshot.data!;
+                          return Column(
+                            children: [
+                              Text(
+                                'Suggested Parts',
+                                style: theme.textTheme.headlineLarge,
+                              ),
+                              SizedBox(
+                                height: 130,
+                                child: ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0,
+                                  ),
+                                  children: parts.map((part) {
+                                    final isSelected = appliedParts.any(
+                                      (p) => p.id == part.id,
+                                    );
+                                    return GestureDetector(
+                                      onTap: () {
+                                        context
+                                            .read<CarLogic>()
+                                            .applyPartUpgrade(
+                                              originalCar,
+                                              part,
+                                            );
+                                      },
+                                      child: Card(
+                                        color: isSelected
+                                            ? theme.primaryColor.withOpacity(
+                                                0.7,
+                                              )
+                                            : theme.cardColor.withOpacity(0.9),
+                                        elevation: 4,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                          vertical: 4.0,
+                                        ),
+                                        child: Container(
+                                          width: 110,
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    border: isSelected
+                                                        ? Border.all(
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                  0.8,
+                                                                ),
+                                                            width: 1.5,
+                                                          )
+                                                        : null,
+                                                  ),
+                                                  child: Image.asset(
+                                                    part.imagePath,
+                                                    height: 48,
+                                                    width: 48,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) => Image.asset(
+                                                          'assets/images/placeholder.jpeg',
+                                                          height: 48,
+                                                          width: 48,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 6),
+                                              Flexible(
+                                                child: Text(
+                                                  part.partName,
+                                                  style: theme
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        color: isSelected
+                                                            ? Colors.white
+                                                            : theme
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                                  ?.color,
+                                                        fontSize: 12,
+                                                      ),
+                                                  textAlign: TextAlign.center,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    if (widget.product is Car) const SizedBox(height: 20),
+                    // Product Details
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.indigo.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: theme.dividerColor.withOpacity(0.2),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Price (including applied parts)
+                                Text(
+                                  '\$${totalPrice.toStringAsFixed(2)}',
+                                  style: theme.textTheme.headlineLarge,
+                                ),
+                                const SizedBox(height: 16),
+                                // Description
+                                Text(
+                                  'Description',
+                                  style: theme.textTheme.headlineMedium,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  widget.product.description,
+                                  style: theme.textTheme.bodyLarge,
                                 ),
                               ],
                             ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 80), // Extra space for FAB
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.indigo.withValues(alpha: 0.85),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              'Price: \$${product.price.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Description: ${product.description}',
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 16,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            if (product is Car) ...[
-                              Text(
-                                'Horsepower: ${(product as Car).horsepower} HP',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'Top Speed: ${(product as Car).topSpeed} km/h',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'Weight: ${(product as Car).weight} kg',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                '0-100 km/h: ${(product as Car).zeroToHundred.toStringAsFixed(1)} s',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ] else if (product is Part) ...[
-                              Text(
-                                'HP Boost: ${(product as Part).hpBoost}',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'Top Speed Boost: ${(product as Part).topSpeedBoost} km/h',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                'Weight Change: ${(product as Part).weightChange} kg',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                '0-100 Change: ${(product as Part).zeroToHundredChange.toStringAsFixed(1)} s',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.indigo,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
-                          ),
-                          child: const Text(
-                            'Back to Home',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

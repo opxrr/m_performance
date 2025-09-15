@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:m_performance/custom_widgets/custom_text_form_field.dart';
 import 'package:m_performance/m_database/database_manager.dart';
-import 'package:m_performance/m_database/user.dart';
+import 'package:m_performance/m_database/models/user.dart';
 import 'package:sqflite/sqflite.dart';
 
 

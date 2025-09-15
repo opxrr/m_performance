@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:m_performance/m_database/car.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:m_performance/m_database/car_manager.dart';
+import 'package:m_performance/m_database/models/car.dart';
 
 import '../custom_widgets/product_card.dart';
 
@@ -79,10 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: IconButton(
                       onPressed: _prevPage,
-                      icon: const Icon(
-                        Icons.arrow_left,
-                        color: Colors.white,
-                        size: 40,
+                      icon: SvgPicture.asset(
+                        'assets/icons/arrow-prev-svgrepo-com.svg',
+                        colorFilter: ColorFilter.linearToSrgbGamma(),
                       ),
                     ),
                   ),
@@ -94,10 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: IconButton(
                       onPressed: _nextPage,
-                      icon: const Icon(
-                        Icons.arrow_right,
-                        color: Colors.white,
-                        size: 40,
+                      icon: SvgPicture.asset(
+                        'assets/icons/arrow-next-svgrepo-com.svg',
+                        colorFilter: ColorFilter.linearToSrgbGamma(),
                       ),
                     ),
                   ),
@@ -175,7 +174,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
 
 /*
 import 'package:flutter/material.dart';

@@ -15,7 +15,7 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int currentIndex = 0;
 
-  final List<Widget> _pages = [HomeScreen(), ExploreScreen(), ProfileScreen()];
+  final List<Widget> _pages = [HomeScreen(), ProfileScreen(), ExploreScreen()];
 
   @override
   Widget build(BuildContext context) {

@@ -2,18 +2,16 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:m_performance/admin/admin_custom_widgets/search_button.dart';
 import 'package:m_performance/admin/admin_custom_widgets/search_field.dart';
-import 'package:m_performance/m_database/car.dart';
-import 'package:m_performance/m_database/part.dart';
-import 'package:m_performance/m_database/user.dart';
+import 'package:m_performance/m_database/models/car.dart';
+import 'package:m_performance/m_database/models/part.dart';
+import 'package:m_performance/m_database/models/user.dart';
 import 'package:m_performance/m_database/car_manager.dart';
 import 'package:m_performance/m_database/part_manager.dart';
 import 'package:m_performance/m_database/database_manager.dart';
-import '../custom_widgets/product_card.dart';
 import 'admin_custom_widgets/dialogs.dart';
 import 'admin_custom_widgets/operation_button.dart';
 import 'admin_custom_widgets/result_text.dart';
 import 'admin_custom_widgets/search_type.dart';
-
 
 class AdminPanel extends StatefulWidget {
   static const String routeName = 'adminPanel';
@@ -127,6 +125,83 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
         duration: const Duration(seconds: 3),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
+    );
+  }
+
+  void _showProductActionDialog(BuildContext context, dynamic product) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF232020),
+          title: Text(
+            product is Car ? 'Manage Car: ${product.modelName}' : 'Manage Part: ${product.partName}',
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: const Text(
+            'Choose an action for this product:',
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                if (product is Car) {
+                  Dialogs.showUpdateCarDialog(
+                    context: context,
+                    carManager: carManager,
+                    car: product,
+                    onSuccess: () {
+                      _loadAllData();
+                      _showAwesomeSnackbar('Success', 'Car updated!', ContentType.success);
+                    },
+                  );
+                } else if (product is Part) {
+                  Dialogs.showUpdatePartDialog(
+                    context: context,
+                    partManager: partManager,
+                    part: product,
+                    onSuccess: () {
+                      _loadAllData();
+                      _showAwesomeSnackbar('Success', 'Part updated!', ContentType.success);
+                    },
+                  );
+                }
+              },
+              child: const Text('Update', style: TextStyle(color: Colors.blueAccent)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                if (product is Car) {
+                  Dialogs.showDeleteCarDialog(
+                    context: context,
+                    carManager: carManager,
+                    onSuccess: () {
+                      _loadAllData();
+                      _showAwesomeSnackbar('Success', 'Car deleted!', ContentType.success);
+                    },
+                  );
+                } else if (product is Part) {
+                  Dialogs.showDeletePartDialog(
+                    context: context,
+                    partManager: partManager,
+                    onSuccess: () {
+                      _loadAllData();
+                      _showAwesomeSnackbar('Success', 'Part deleted!', ContentType.success);
+                    },
+                  );
+                }
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.blueAccent)),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -447,20 +522,52 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
   Widget _buildCarsList() {
     return filteredCars.isEmpty
         ? const Text('No cars found', style: TextStyle(color: Colors.white70))
-        : GridView.builder(
+        : ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.75,
-      ),
       itemCount: filteredCars.length,
       itemBuilder: (context, index) {
         final car = filteredCars[index];
-        return MyProductCard(
-          product: car,
+        return Card(
+          color: Colors.indigo.withOpacity(0.85),
+          elevation: 6,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                car.imagePath,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  'assets/images/placeholder.jpeg',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            title: Text(
+              car.modelName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              'Price: ${car.price} USD',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            trailing: Text(
+              'ID: ${car.id}',
+              style: const TextStyle(color: Colors.white),
+            ),
+            onTap: () => _showProductActionDialog(context, car),
+          ),
         );
       },
     );
@@ -469,20 +576,52 @@ class _AdminPanelState extends State<AdminPanel> with SingleTickerProviderStateM
   Widget _buildPartsList() {
     return filteredParts.isEmpty
         ? const Text('No parts found', style: TextStyle(color: Colors.white70))
-        : GridView.builder(
+        : ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 0.75,
-      ),
       itemCount: filteredParts.length,
       itemBuilder: (context, index) {
         final part = filteredParts[index];
-        return MyProductCard(
-          product: part,
+        return Card(
+          color: Colors.indigo.withOpacity(0.85),
+          elevation: 6,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                part.imagePath,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  'assets/images/placeholder.jpeg',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            title: Text(
+              part.partName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              'Price: ${part.price} USD',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            trailing: Text(
+              'ID: ${part.id}',
+              style: const TextStyle(color: Colors.white),
+            ),
+            onTap: () => _showProductActionDialog(context, part),
+          ),
         );
       },
     );
