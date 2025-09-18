@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:m_performance/Screens/home.dart';
 import 'package:m_performance/Screens/register_screen.dart';
 import 'package:m_performance/admin/admin_panel.dart';
+import 'package:m_performance/custom_widgets/custom_text_form_field.dart';
 import 'package:m_performance/m_database/database_manager.dart';
 import 'package:m_performance/m_database/models/user.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = 'loginScreen';
+
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -60,118 +63,141 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF232020),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade900, Colors.black],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+      backgroundColor: Colors.black87,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF121212),
+        title: Image.asset(
+          "assets/images/mLogo.png",
+          width: 160,
+          errorBuilder: (context, error, stackTrace) =>
+          const Text('Logo', style: TextStyle(color: Colors.white)),
         ),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Card(
-              color: Colors.white.withOpacity(0.9),
-              elevation: 10,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 100),
+            const Text(
+              "Welcome Back 👋",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              child: Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Welcome Back 👋",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade900,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "Sign in to continue",
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                    const SizedBox(height: 30),
-                    TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: "Email",
-                        prefixIcon: Icon(Icons.email, color: Colors.blue),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        prefixIcon: Icon(Icons.lock, color: Colors.blue),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      obscureText: true,
-                    ),
-                    const SizedBox(height: 25),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        minimumSize: Size(double.infinity, 55),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        elevation: 6,
-                      ),
-                      onPressed: _isLoading ? null : _signIn,
-                      child: _isLoading
-                          ? SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              "Sign In",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                    const SizedBox(height: 15),
-                    TextButton(
-                      onPressed: () => Navigator.pushNamed(
-                        context,
-                        RegisterScreen.routeName,
-                      ),
-                      child: Text("Don't have an account? Sign Up"),
-                    ),
-                  ],
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "Sign in to continue",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 15),
+            CustomTextFormField(
+              preIcon: const Icon(
+                Icons.email_outlined,
+                color: Colors.white70,
+              ),
+              hintText: 'email',
+              obscureText: false,
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'email is required';
+                }
+                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                  return 'enter a valid email';
+                }
+                return null;
+              },
+            ),
+            CustomTextFormField(
+              preIcon: const Icon(
+                Icons.password_outlined,
+                color: Colors.white70,
+              ),
+              hintText: 'password',
+              obscureText: true,
+              controller: _passwordController,
+              keyboardType: TextInputType.text,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'password is required';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20), // Matches CustomTextFormField padding
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  elevation: 6,
+                ),
+                onPressed: _isLoading ? null : _signIn,
+                child: _isLoading
+                    ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+                    : const Text(
+                  'Sign In',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
+            const SizedBox(height: 15),
+            TextButton(
+              onPressed: () => Navigator.pushNamed(
+                context,
+                RegisterScreen.routeName,
+              ),
+              child: const Text(
+                "Don't have an account? Sign Up",
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

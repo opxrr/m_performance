@@ -3,7 +3,6 @@ import 'package:m_performance/m_database/models/product.dart';
 class Car implements Product {
   @override
   final int? id;
-  @override
   final String modelName;
   @override
   final String imagePath;
