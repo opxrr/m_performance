@@ -10,6 +10,7 @@ import 'package:m_performance/admin/admin_panel.dart';
 import 'package:m_performance/cubit/car_cubit/car_logic.dart';
 import 'package:m_performance/m_database/models/product.dart';
 import 'package:m_performance/main_layout.dart';
+import 'package:m_performance/theme/app_themes.dart';
 
 import 'm_database/models/car.dart';
 
@@ -28,8 +29,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'M Performance Tuning',
         theme: ThemeData(
-          primaryColor: Colors.indigo.shade700,
-          secondaryHeaderColor: Colors.indigo.shade300,
+          primaryColor: Color(0xFF0066B1),
+          secondaryHeaderColor: Color(0x323547FF),
+
           scaffoldBackgroundColor: Colors.grey.shade100,
           textTheme: const TextTheme(
             headlineLarge: TextStyle(
@@ -53,7 +55,7 @@ class MyApp extends StatelessWidget {
           cardColor: Colors.white,
           iconTheme: const IconThemeData(color: Colors.indigo),
           floatingActionButtonTheme: const FloatingActionButtonThemeData(
-            backgroundColor: Colors.indigoAccent,
+            backgroundColor: AppTheme.primaryColor,
             foregroundColor: Colors.white,
           ),
           dividerColor: Colors.grey,

@@ -4,7 +4,6 @@ import 'package:m_performance/m_database/database_manager.dart';
 import 'package:m_performance/m_database/models/user.dart';
 import 'package:sqflite/sqflite.dart';
 
-
 class RegisterScreen extends StatefulWidget {
   static const String routeName = 'registerScreen';
 
@@ -42,7 +41,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       try {
         int id = await _userTable.insertUser(newUser);
         if (id != -1) {
-          // Show success dialog
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -70,12 +68,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           );
         } else {
-          // Show generic error dialog
           _showErrorDialog('Error registering user. Please try again.');
         }
       } on DatabaseException catch (e) {
         if (e.isUniqueConstraintError()) {
-          _showErrorDialog('Email already exists. Please use a different email.');
+          _showErrorDialog(
+            'Email already exists. Please use a different email.',
+          );
         } else {
           _showErrorDialog('Error registering user: $e');
         }
@@ -92,24 +91,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'Registration Failed',
           style: TextStyle(color: Colors.white),
         ),
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white70),
-        ),
+        content: Text(message, style: const TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text(
-              'OK',
-              style: TextStyle(color: Colors.blueAccent),
-            ),
+            child: const Text('OK', style: TextStyle(color: Colors.blueAccent)),
           ),
         ],
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
     );
   }
@@ -124,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           "assets/images/mLogo.png",
           width: 160,
           errorBuilder: (context, error, stackTrace) =>
-          const Text('Logo', style: TextStyle(color: Colors.white)),
+              const Text('Logo', style: TextStyle(color: Colors.white)),
         ),
         centerTitle: true,
       ),
@@ -192,17 +183,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 },
               ),
               const SizedBox(height: 50),
-              ElevatedButton(
-                onPressed: _register,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                // Matches CustomTextFormField padding
+                child: ElevatedButton(
+                  onPressed: _register,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                   ),
+                  child: const Text('Register', style: TextStyle(fontSize: 16)),
                 ),
-                child: const Text('Register', style: TextStyle(fontSize: 16)),
               ),
             ],
           ),
